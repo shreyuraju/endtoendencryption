@@ -4,6 +4,7 @@
     package="com.end2endmessage.e2em">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
 
     <application
         android:allowBackup="true"
@@ -15,9 +16,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.E2EM"
         tools:targetApi="31">
-        <activity
-            android:name=".chat"
-            android:exported="false" />
         <activity
             android:name=".MessageActivity"
             android:exported="false" />
@@ -40,5 +38,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>
