@@ -22,7 +22,7 @@ public class Chat {
         this.sender = sender;
     }
 
-    public String getReceiver(String userUID) {
+    public String getReceiver(String receiver) {
         return receiver;
     }
 
