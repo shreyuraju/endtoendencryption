@@ -2,6 +2,7 @@ package com.end2endmessage.e2em;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -12,16 +13,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.end2endmessage.e2em.adapters.MessageAdapter;
-import com.end2endmessage.e2em.adapters.Chat;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class MessageActivity extends AppCompatActivity implements View.OnClickListener {
@@ -39,11 +41,10 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     TextView userId;
     EditText sendText;
     RecyclerView messageView;
-    String UID,senderUID,userUID, email;
+    String UID,senderUID,receiverUID, email;
 
     MessageAdapter messageAdapter;
-    ArrayList<Chat> chatArrayList;
-
+    final List<Messages> messagesList = new ArrayList<>();
     RecyclerView recyclerView;
 
     FirebaseUser fuser;
@@ -58,18 +59,20 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         if ( getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-        Chat chat= new Chat();
+
         fuser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference();
         senderUID = fuser.getUid();
 
-        recyclerView = findViewById(R.id.messageView);
+        messageAdapter = new MessageAdapter(messagesList);
+        recyclerView = findViewById(R.id.specipicMessageView);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(messageAdapter);
 
-        messageAdapter = new MessageAdapter(MessageActivity.this, chatArrayList);
+
 
 
         userId = findViewById(R.id.userId);
@@ -78,17 +81,43 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         sendText = findViewById(R.id.sendText);
         menuBtn.setOnClickListener(this);
         sendBtn.setOnClickListener(this);
+
         Intent i= getIntent();
         Bundle b = i.getExtras();
         UID = b.getString("UID");
-        userUID = b.getString("userUID");
+        receiverUID = b.getString("userUID");
         email = b.getString("email");
         userId.setText(UID+" : "+email);
 
-        chat.setSender(senderUID);
-        chat.getReceiver(userUID);
+        reference.child("Chats").child(senderUID).child(receiverUID).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Messages messages = snapshot.getValue(Messages.class);
+                messagesList.add(messages);
+                recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount());
+            }
 
-        readMessagges(senderUID, userUID);
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
 
@@ -101,7 +130,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     if(item.getItemId() == R.id.logout){
-                        UID=userUID=email=null;
+                        UID=receiverUID=email=null;
                         finish();
                         startActivity(new Intent(getApplicationContext(), connect.class));
                     }
@@ -112,7 +141,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         } else if(v.equals(sendBtn)) {
             String sendMsg = sendText.getText().toString().trim();
             if(!sendMsg.equals("")){
-                sendMessage(senderUID, userUID, sendMsg);
+                sendMessage(senderUID, receiverUID, sendMsg);
                 sendText.setText("");
             } else {
                 Toast.makeText(this, "Can't send Em[ty message", Toast.LENGTH_SHORT).show();
@@ -120,27 +149,37 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    private void sendMessage(String senderUID, String userUID, String sendMsg) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("sender",senderUID );
-        hashMap.put("receiver", userUID);
-        hashMap.put("message", sendMsg);
-        databaseReference.child("Chats").child(senderUID).push().setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+    private void sendMessage(String senderUID, String receiverUID, String sendMsg) {
+        String messageSenderRef="Chats/"+senderUID+"/"+receiverUID;
+        String messageReceiverRef="Chats/"+receiverUID+"/"+senderUID;
+        DatabaseReference databaseReference = reference.child("Chats").child(senderUID).child(receiverUID).push();
+        String msgPushID = databaseReference.getKey();
+        Map map = new HashMap();
+        map.put("from",senderUID );
+        map.put("to", receiverUID);
+        map.put("message", sendMsg);
+        map.put("messageID", msgPushID);
+        map.put("type","text");
+
+        Map mapBody = new HashMap();
+        mapBody.put(messageSenderRef+"/"+msgPushID, map);
+        mapBody.put(messageReceiverRef+"/"+msgPushID, map);
+
+        reference.updateChildren(mapBody).addOnCompleteListener(new OnCompleteListener() {
             @Override
-            public void onSuccess(Void unused) {
-                Toast.makeText(getApplicationContext(), "Message Sent", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(MessageActivity.this, "Error :"+e.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onComplete(@NonNull Task task) {
+                if(task.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), "Message Sent", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Error :"+task.getException(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
-    }
 
+    }
+/*
     private void readMessagges(String myId, String userid) {
-        chatArrayList = new ArrayList<>();
+        chatArrayList = new ArrayList<Chat>();
         reference = FirebaseDatabase.getInstance().getReference("Chats");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -148,7 +187,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 chatArrayList.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Chat chat = snapshot.getValue(Chat.class);
-                        chatArrayList.add(chat);
+                    Log.d("TAG",chat.toString());
+                    chatArrayList.add(chat);
                 }
                 messageAdapter.notifyDataSetChanged();
             }
@@ -173,5 +213,5 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         {
             messageAdapter.notifyDataSetChanged();
         }
-    }
+    } */
 }

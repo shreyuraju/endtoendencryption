@@ -9,7 +9,8 @@
 <com.google.android.material.appbar.AppBarLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_alignParentTop="true">
+    android:layout_alignParentTop="true"
+    android:id="@+id/appBar">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolBar"
@@ -43,12 +44,13 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/messageView"
+        android:id="@+id/specipicMessageView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@id/bottom"
-        android:layout_marginBottom="2dp">
-
+        android:layout_below="@+id/appBar"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="5dp">
     </androidx.recyclerview.widget.RecyclerView>
 
     <RelativeLayout
