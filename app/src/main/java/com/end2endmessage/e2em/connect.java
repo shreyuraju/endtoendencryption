@@ -99,6 +99,7 @@ public class connect extends AppCompatActivity {
                                     b.putString("email", email);
                                     i.putExtras(b);
                                     startActivity(i);
+                                    progressDialog.dismiss();
                                 } else {
                                     Log.d(TAG, "Error ");
                                     Toast.makeText(getApplicationContext(), "No User Found", Toast.LENGTH_SHORT).show();
