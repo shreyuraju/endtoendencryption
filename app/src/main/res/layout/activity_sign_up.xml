@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".signUp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingTop="100dp"
+            android:text="Sign Up"
+            android:textAlignment="center"
+            android:textSize="60sp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_margin="10dp"
+            android:background="@color/teal_200" />
+
+        <EditText
+            android:id="@+id/emailSignup"
+            android:layout_width="340dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="60dp"
+            android:drawableStart="@drawable/ic_email"
+            android:drawablePadding="10dp"
+            android:hint="E-mail"
+            android:inputType="textPersonName"
+            android:minHeight="48dp" />
+<com.google.android.material.textfield.TextInputLayout
+    app:passwordToggleEnabled="true"
+    android:layout_width="340dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    app:boxBackgroundColor="@android:color/transparent">
+
+    <EditText
+        android:id="@+id/passwordSignup"
+        android:layout_width="340dp"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_password"
+        android:drawablePadding="2dp"
+        android:hint="password"
+        android:inputType="textPassword"
+        android:minHeight="48dp" />
+
+</com.google.android.material.textfield.TextInputLayout>
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="340dp"
+            android:layout_height="46dp"
+            android:layout_gravity="center"
+            android:checked="false"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="I agree the terms and conditions of the app" />
+
+        <Button
+            android:id="@+id/signUpbtn"
+            android:layout_width="340dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:enabled="false"
+            android:padding="10dp"
+            android:text="Sign-Up" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_margin="10dp"
+            android:background="@color/teal_200" />
+        <TextView
+            android:id="@+id/signInbtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:textSize="15sp"
+            android:text="Already a User? Sign-In Here" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:visibility="invisible" />
+    </LinearLayout>
+
+</LinearLayout>
