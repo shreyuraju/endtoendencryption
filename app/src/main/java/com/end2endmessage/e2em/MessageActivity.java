@@ -2,6 +2,7 @@ package com.end2endmessage.e2em;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MessageActivity extends AppCompatActivity implements View.OnClickListener {
@@ -60,6 +63,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             getSupportActionBar().hide();
         }
 
+
+
         fuser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference();
         senderUID = fuser.getUid();
@@ -81,6 +86,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         sendText = findViewById(R.id.sendText);
         menuBtn.setOnClickListener(this);
         sendBtn.setOnClickListener(this);
+
+        context();
 
         Intent i= getIntent();
         Bundle b = i.getExtras();
@@ -118,6 +125,22 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
+    }
+
+    private void context() {
+        messageAdapter.notifyDataSetChanged();
+        refresh(100);
+    }
+
+    private void refresh(int i) {
+        final Handler handler = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                context();
+            }
+        };
+        handler.postDelayed(runnable, i);
     }
 
 
@@ -169,35 +192,14 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onComplete(@NonNull Task task) {
                 if(task.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), "Message Sent", Toast.LENGTH_SHORT).show();
+                    Log.d("TAG",task.getResult().toString());
+                    //Toast.makeText(getApplicationContext(), "Message Sent", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Error :"+task.getException(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-    }
-/*
-    private void readMessagges(String myId, String userid) {
-        chatArrayList = new ArrayList<Chat>();
-        reference = FirebaseDatabase.getInstance().getReference("Chats");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                chatArrayList.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    Chat chat = snapshot.getValue(Chat.class);
-                    Log.d("TAG",chat.toString());
-                    chatArrayList.add(chat);
-                }
-                messageAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
     }
 
     @Override
@@ -213,5 +215,6 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         {
             messageAdapter.notifyDataSetChanged();
         }
-    } */
+    }
+
 }
