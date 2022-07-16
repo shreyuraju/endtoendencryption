@@ -62,9 +62,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         if ( getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-
-
-
+        context();
         fuser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference();
         senderUID = fuser.getUid();
@@ -87,7 +85,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         menuBtn.setOnClickListener(this);
         sendBtn.setOnClickListener(this);
 
-        context();
+
 
         Intent i= getIntent();
         Bundle b = i.getExtras();
