@@ -189,7 +189,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onComplete(@NonNull Task task) {
                 if(task.isSuccessful()) {
-                    Log.d("TAG",task.getResult().toString());
+                    Log.d("TAG","Message sent successfully");
                     //Toast.makeText(getApplicationContext(), "Message Sent", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Error :"+task.getException(), Toast.LENGTH_SHORT).show();
