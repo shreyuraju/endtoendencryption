@@ -45,7 +45,6 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     ImageButton sendBtn, menuBtn;
     TextView userId;
     EditText sendText;
-    RecyclerView messageView;
     String UID,senderUID,receiverUID, email;
 
     MessageAdapter messageAdapter;
@@ -64,8 +63,6 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         if ( getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-
-
 
         fuser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference();

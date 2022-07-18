@@ -11,6 +11,7 @@ import android.content.Intent;
 
 import android.os.Bundle;
 
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +39,7 @@ public class connect extends AppCompatActivity {
     FirebaseFirestore db;
     EditText connectId;
     ProgressDialog progressDialog;
+    boolean isPressed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,4 +186,23 @@ public class connect extends AppCompatActivity {
         checkisEmailVerified();
         super.onStart();
     }
+
+    @Override
+    public void onBackPressed() {
+            if(isPressed) {
+                finishAffinity();
+                System.exit(0);
+            } else {
+                Toast.makeText(this, "Press again to Exit", Toast.LENGTH_SHORT).show();
+                isPressed = true;
+            }
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                isPressed = false;
+            }
+        };
+        new Handler().postDelayed(runnable,2000);
+    }
+
 }
