@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,12 +33,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 
 public class MessageActivity extends AppCompatActivity implements View.OnClickListener {
@@ -53,6 +62,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
 
     FirebaseUser fuser;
     DatabaseReference reference;
+
+    String AES = "AES";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,6 +171,11 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         } else if(v.equals(sendBtn)) {
             String sendMsg = sendText.getText().toString().trim();
             if(!sendMsg.equals("")){
+              //  try {
+              //      sendMsg = encrypt(sendMsg);
+              //  } catch (Exception e) {
+              //      Toast.makeText(this, "ERROR: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+              //  }
                 sendMessage(senderUID, receiverUID, sendMsg);
                 sendText.setText("");
             } else {
@@ -167,7 +183,27 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             }
         }
     }
+/*
+    private String encrypt(String sendMsg) throws Exception {
+        SecretKeySpec key = generateKey(sendMsg);
+        Cipher c = Cipher.getInstance(AES);
+        c.init(Cipher.ENCRYPT_MODE,key);
+        byte[] encVal = c.doFinal(sendMsg.getBytes());
+        String encryptedValue = Base64.encodeToString(encVal, Base64.DEFAULT);
+        return encryptedValue;
 
+    }
+
+    private SecretKeySpec generateKey(String sendMsg) throws Exception {
+
+        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] bytes = sendMsg.getBytes("UTF-8");
+        digest.update(bytes, 0, bytes.length);
+        byte[] key = digest.digest();
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key,"AES");
+        return secretKeySpec;
+    }
+*/
     private void sendMessage(String senderUID, String receiverUID, String sendMsg) {
         String messageSenderRef="Chats/"+senderUID+"/"+receiverUID;
         String messageReceiverRef="Chats/"+receiverUID+"/"+senderUID;
