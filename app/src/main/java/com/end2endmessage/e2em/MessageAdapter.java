@@ -1,5 +1,7 @@
 package com.end2endmessage.e2em;
 
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +19,18 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
+import java.security.MessageDigest;
 import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
     private List<Messages> UserMessageList;
     private DatabaseReference userRef;
     private FirebaseAuth fauth;
-
+    private String AES="AES";
     public MessageAdapter(List<Messages> UserMessagesList) {
         this.UserMessageList=UserMessagesList;
 
@@ -65,14 +71,45 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if(fromuserID.equals(messageSendID)) {
                 holder.senderMessageText.setVisibility(View.VISIBLE);
                 holder.senderMessageText.setBackgroundResource(R.drawable.sender_message_layout);
-                holder.senderMessageText.setText(messages.getMessage());
+                String msg = messages.getMessage();
+              //  try {
+              //      msg = decrypt(msg);
+               // } catch (Exception e) {
+              //      Log.d("TAG : ","ERROR decrypting: "+e.getMessage());
+              //  }
+                holder.senderMessageText.setText(msg);
             } else {
                 holder.receiverMessageText.setVisibility(View.VISIBLE);
                 holder.receiverMessageText.setBackgroundResource(R.drawable.receiver_message_layout);
-                holder.receiverMessageText.setText(messages.getMessage());
+                String msg = messages.getMessage();
+               // try {
+                //    msg = decrypt(msg);
+              //  } catch (Exception e) {
+               //     Log.d("TAG : ","ERROR decrypting: "+e.getMessage());
+               // }
+                holder.receiverMessageText.setText(msg);
             }
         }
 
+    }
+
+    private String decrypt(String msg) throws Exception {
+        SecretKeySpec key = generateKey(msg);
+        Cipher c = Cipher.getInstance(AES);
+        c.init(Cipher.DECRYPT_MODE, key);
+        byte[] decodedValue = Base64.decode(msg, Base64.DEFAULT);
+        byte[] decValue = c.doFinal(decodedValue);
+        String decryptedValue = new String(decValue);
+        return decryptedValue;
+    }
+
+    private SecretKeySpec generateKey(String msg) throws Exception {
+        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] bytes = msg.getBytes("UTF-8");
+        digest.update(bytes, 0, bytes.length);
+        byte[] key = digest.digest();
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key,"AES");
+        return secretKeySpec;
     }
 
     @Override

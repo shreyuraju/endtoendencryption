@@ -172,9 +172,9 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             String sendMsg = sendText.getText().toString().trim();
             if(!sendMsg.equals("")){
               //  try {
-              //      sendMsg = encrypt(sendMsg);
-              //  } catch (Exception e) {
-              //      Toast.makeText(this, "ERROR: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+               //     sendMsg = encrypt(sendMsg);
+              // } catch (Exception e) {
+                //    Toast.makeText(this, "ERROR: "+e.getMessage(), Toast.LENGTH_SHORT).show();
               //  }
                 sendMessage(senderUID, receiverUID, sendMsg);
                 sendText.setText("");
@@ -183,7 +183,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             }
         }
     }
-/*
+
     private String encrypt(String sendMsg) throws Exception {
         SecretKeySpec key = generateKey(sendMsg);
         Cipher c = Cipher.getInstance(AES);
@@ -203,7 +203,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         SecretKeySpec secretKeySpec = new SecretKeySpec(key,"AES");
         return secretKeySpec;
     }
-*/
+
     private void sendMessage(String senderUID, String receiverUID, String sendMsg) {
         String messageSenderRef="Chats/"+senderUID+"/"+receiverUID;
         String messageReceiverRef="Chats/"+receiverUID+"/"+senderUID;
