@@ -101,7 +101,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         UID = b.getString("UID");
         receiverUID = b.getString("userUID");
         email = b.getString("email");
-        userId.setText(UID+" : "+email);
+        userId.setText(UID);
 
         reference.child("Chats").child(senderUID).child(receiverUID).addChildEventListener(new ChildEventListener() {
             @Override
