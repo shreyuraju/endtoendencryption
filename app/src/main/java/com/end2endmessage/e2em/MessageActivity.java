@@ -63,7 +63,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     FirebaseUser fuser;
     DatabaseReference reference;
 
-    String AES = "AES";
+    String AES = "AES", password="AESEncyption";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,11 +171,11 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         } else if(v.equals(sendBtn)) {
             String sendMsg = sendText.getText().toString().trim();
             if(!sendMsg.equals("")){
-              //  try {
-               //     sendMsg = encrypt(sendMsg);
-              // } catch (Exception e) {
-                //    Toast.makeText(this, "ERROR: "+e.getMessage(), Toast.LENGTH_SHORT).show();
-              //  }
+                try {
+                    sendMsg = encrypt(sendMsg, password);
+                } catch (Exception e) {
+                    Toast.makeText(this, "ERROR: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
                 sendMessage(senderUID, receiverUID, sendMsg);
                 sendText.setText("");
             } else {
@@ -184,8 +184,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    private String encrypt(String sendMsg) throws Exception {
-        SecretKeySpec key = generateKey(sendMsg);
+    private String encrypt(String sendMsg, String password) throws Exception {
+        SecretKeySpec key = generateKey(password);
         Cipher c = Cipher.getInstance(AES);
         c.init(Cipher.ENCRYPT_MODE,key);
         byte[] encVal = c.doFinal(sendMsg.getBytes());
@@ -194,10 +194,10 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private SecretKeySpec generateKey(String sendMsg) throws Exception {
+    private SecretKeySpec generateKey(String password) throws Exception {
 
         final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] bytes = sendMsg.getBytes("UTF-8");
+        byte[] bytes = password.getBytes("UTF-8");
         digest.update(bytes, 0, bytes.length);
         byte[] key = digest.digest();
         SecretKeySpec secretKeySpec = new SecretKeySpec(key,"AES");

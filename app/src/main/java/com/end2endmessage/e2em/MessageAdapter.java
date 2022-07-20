@@ -30,7 +30,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private List<Messages> UserMessageList;
     private DatabaseReference userRef;
     private FirebaseAuth fauth;
-    private String AES="AES";
+    private String AES = "AES", password="AESEncyption";
     public MessageAdapter(List<Messages> UserMessagesList) {
         this.UserMessageList=UserMessagesList;
 
@@ -72,40 +72,39 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 holder.senderMessageText.setVisibility(View.VISIBLE);
                 holder.senderMessageText.setBackgroundResource(R.drawable.sender_message_layout);
                 String msg = messages.getMessage();
-              //  try {
-              //      msg = decrypt(msg);
-               // } catch (Exception e) {
-              //      Log.d("TAG : ","ERROR decrypting: "+e.getMessage());
-              //  }
+                try {
+                    msg = decrypt(msg,password);
+                } catch (Exception e) {
+                    Log.d("TAG : ","ERROR decrypting: "+e.getMessage());
+                }
                 holder.senderMessageText.setText(msg);
             } else {
                 holder.receiverMessageText.setVisibility(View.VISIBLE);
                 holder.receiverMessageText.setBackgroundResource(R.drawable.receiver_message_layout);
                 String msg = messages.getMessage();
-               // try {
-                //    msg = decrypt(msg);
-              //  } catch (Exception e) {
-               //     Log.d("TAG : ","ERROR decrypting: "+e.getMessage());
-               // }
+                try {
+                    msg = decrypt(msg,password);
+                } catch (Exception e) {
+                    Log.d("TAG : ","ERROR decrypting: "+e.getMessage());
+                }
                 holder.receiverMessageText.setText(msg);
             }
         }
 
     }
 
-    private String decrypt(String msg) throws Exception {
-        SecretKeySpec key = generateKey(msg);
+    private String decrypt(String msg, String password) throws Exception {
+        SecretKeySpec key = generateKey(password);
         Cipher c = Cipher.getInstance(AES);
         c.init(Cipher.DECRYPT_MODE, key);
         byte[] decodedValue = Base64.decode(msg, Base64.DEFAULT);
         byte[] decValue = c.doFinal(decodedValue);
-        String decryptedValue = new String(decValue);
-        return decryptedValue;
+        return new String(decValue);
     }
 
-    private SecretKeySpec generateKey(String msg) throws Exception {
+    private SecretKeySpec generateKey(String password) throws Exception {
         final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] bytes = msg.getBytes("UTF-8");
+        byte[] bytes = password.getBytes("UTF-8");
         digest.update(bytes, 0, bytes.length);
         byte[] key = digest.digest();
         SecretKeySpec secretKeySpec = new SecretKeySpec(key,"AES");
@@ -118,15 +117,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     public class MessageViewHolder extends RecyclerView.ViewHolder{
-
-
         public TextView senderMessageText, receiverMessageText;
-
         public MessageViewHolder(@NonNull View view) {
             super(view);
             senderMessageText = view.findViewById(R.id.sender_message_text);
             receiverMessageText = view.findViewById(R.id.receiver_message_text);
-
         }
     }
 }
