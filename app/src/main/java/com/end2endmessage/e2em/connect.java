@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -32,6 +33,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.List;
 
 public class connect extends AppCompatActivity {
+    SwipeRefreshLayout swipe;
     Button logout,chatBtn,verifyBtn;
     FirebaseAuth auth;
     FirebaseUser userId,user;
@@ -49,13 +51,16 @@ public class connect extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
+        swipe = findViewById(R.id.swipeLayout);
 
         progressDialog = new ProgressDialog(this);
 
         userUID = findViewById(R.id.userId);
         auth=FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
         fetchID();
+
         verifyBtn = findViewById(R.id.verifyBtn);
         verifyText = findViewById(R.id.verifyText);
         connectId = findViewById(R.id.connectId);
@@ -131,6 +136,15 @@ public class connect extends AppCompatActivity {
             }
         });
 
+        //swipe refresh
+        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                checkisEmailVerified();
+                swipe.setRefreshing(false);
+            }
+        });
+
         verifyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -161,12 +175,13 @@ public class connect extends AppCompatActivity {
             verifyText.setVisibility(View.VISIBLE);
             verifyBtn.setVisibility(View.VISIBLE);
             chatBtn.setEnabled(false);
-            Toast.makeText(getApplicationContext(), "Please verify the email", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please verify the email", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "if E-mail is verified \n please logout and sign-in again", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void fetchID() {
-        userId = auth.getCurrentUser();
+        FirebaseUser userId = auth.getCurrentUser();
         String userUid = userId.getUid();
         DocumentReference documentReference = db.collection("users").document(userUid);
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
