@@ -196,7 +196,7 @@ public class signUp extends AppCompatActivity {
         });
 
     }
-/*
+
     private String searchId(String uid) {
         final String[] newUID = new String[1];
         FirebaseFirestore.getInstance()
@@ -220,7 +220,7 @@ public class signUp extends AppCompatActivity {
                 });
         return newUID[0];
     }
-*/
+
     private String getRandomNum() {
         Random rand = new Random();
         int id = rand.nextInt(999999);
