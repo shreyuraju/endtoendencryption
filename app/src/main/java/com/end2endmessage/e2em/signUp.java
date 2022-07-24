@@ -24,7 +24,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdReceiver;
 import com.google.firebase.iid.InstanceIdResult;
@@ -40,6 +43,7 @@ public class signUp extends AppCompatActivity {
     EditText signUpEmail, signUpPassword;
     CheckBox checkBox;
     Button signUp;
+    FirebaseAuth auth;
     TextView signIn;
     FirebaseFirestore db;
     ProgressDialog progressDialog;
@@ -51,6 +55,7 @@ public class signUp extends AppCompatActivity {
         if ( getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+        auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         signUpEmail = findViewById(R.id.emailSignup);
         signUpPassword = findViewById(R.id.passwordSignup);
@@ -170,12 +175,12 @@ public class signUp extends AppCompatActivity {
         sessionManagement.saveSession(sessionuser);
         userUid = user.getUid();
         deviceToken = FirebaseInstallations.getInstance().getToken(true).toString();
+       // UID = searchId(UID);
         HashMap<String, Object> items = new HashMap<>();
         items.put("UID",UID);
         items.put("email",email);
         items.put("userUID", userUid);
         items.put("deviceToken", deviceToken);
-
         db.collection("users").document(userUid).set(items).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -191,6 +196,31 @@ public class signUp extends AppCompatActivity {
         });
 
     }
+/*
+    private String searchId(String uid) {
+        final String[] newUID = new String[1];
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .whereEqualTo("UID", uid)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        if(!queryDocumentSnapshots.isEmpty()){
+                            newUID[0] = getRandomNum();
+                        } else {
+                            return;
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+        return newUID[0];
+    }
+*/
     private String getRandomNum() {
         Random rand = new Random();
         int id = rand.nextInt(999999);
