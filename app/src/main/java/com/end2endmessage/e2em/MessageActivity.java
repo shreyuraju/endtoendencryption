@@ -71,6 +71,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         setContentView(R.layout.activity_message);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+
         if ( getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }

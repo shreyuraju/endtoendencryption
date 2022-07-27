@@ -5,7 +5,6 @@ import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -15,6 +14,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,7 +35,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.List;
 
 public class connect extends AppCompatActivity {
-    SwipeRefreshLayout swipe;
     Button logout,chatBtn,verifyBtn;
     FirebaseAuth auth;
     FirebaseUser userId,user;
@@ -47,14 +48,14 @@ public class connect extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
+/*
         if ( getSupportActionBar() != null) {
             getSupportActionBar().hide();
-        }
+        } */
 
-        swipe = findViewById(R.id.swipeLayout);
+        getSupportActionBar().setTitle("E2EM");
 
         progressDialog = new ProgressDialog(this);
-
         userUID = findViewById(R.id.userId);
         auth=FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -124,7 +125,7 @@ public class connect extends AppCompatActivity {
                         });
             }
         });
-        logout = findViewById(R.id.logout);
+        /*  logout = findViewById(R.id.logout);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,16 +135,8 @@ public class connect extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(),signIn.class));
                 finish();
             }
-        });
+        }); */
 
-        //swipe refresh
-        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                checkisEmailVerified();
-                swipe.setRefreshing(false);
-            }
-        });
 
         verifyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,6 +188,47 @@ public class connect extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Error Fetching Data", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.connect_layout_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.friendconnectID:
+                showFriendsList();
+                return true;
+            case R.id.addFriendsId:
+                addfriendslist();
+                return true;
+            case R.id.connect_logout_menu:
+                connec_logout();
+                return true;
+            default:return super.onOptionsItemSelected(item);
+        }
+        
+    }
+
+    private void addfriendslist() {
+
+    }
+
+    private void showFriendsList() {
+
+    }
+
+    private void connec_logout() {
+        SessionManagement sessionManagement = new SessionManagement(getBaseContext());
+        sessionManagement.removeSession();
+        FirebaseAuth.getInstance().signOut(); //logout
+        startActivity(new Intent(getApplicationContext(),signIn.class));
+        finish();
     }
 
     @Override

@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/swipeLayout"
-    tools:context=".connect">
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    tools:context=".connect"
     android:orientation="vertical">
+
     <TextView
         android:id="@+id/verifyText"
         android:layout_width="250dp"
@@ -79,7 +76,7 @@
 
     </LinearLayout>
 
-    <Button
+ <!--   <Button
         android:id="@+id/logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -88,6 +85,5 @@
         android:minWidth="48dp"
         android:minHeight="48dp"
         android:text="logout"
-        android:textColor="#FFFFFF" />
+        android:textColor="#FFFFFF" /> -->
 </LinearLayout>
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
