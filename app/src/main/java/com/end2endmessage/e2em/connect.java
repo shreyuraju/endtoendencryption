@@ -197,9 +197,9 @@ public class connect extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()) {
-                    Toast.makeText(connect.this, "User is Verified", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(connect.this, "You're Verified", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(connect.this, "not Verified :"+task.getException(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(connect.this, "You're not Verified :"+task.getException(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
