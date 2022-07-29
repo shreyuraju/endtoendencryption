@@ -181,6 +181,7 @@ public class signUp extends AppCompatActivity {
         items.put("email",email);
         items.put("userUID", userUid);
         items.put("deviceToken", deviceToken);
+        items.put("verified","0");
         db.collection("users").document(userUid).set(items).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {

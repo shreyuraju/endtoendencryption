@@ -6,7 +6,9 @@ import static android.content.ContentValues.TAG;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.os.Bundle;
@@ -23,16 +25,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class connect extends AppCompatActivity {
     Button logout,chatBtn,verifyBtn;
@@ -42,6 +50,8 @@ public class connect extends AppCompatActivity {
     FirebaseFirestore db;
     EditText connectId;
     ProgressDialog progressDialog;
+    DatabaseReference reference;
+    String senderUID;
     boolean isPressed = false;
 
     @Override
@@ -54,7 +64,7 @@ public class connect extends AppCompatActivity {
         } */
 
         getSupportActionBar().setTitle("E2EM");
-
+        reference = FirebaseDatabase.getInstance().getReference();
         progressDialog = new ProgressDialog(this);
         userUID = findViewById(R.id.userId);
         auth=FirebaseAuth.getInstance();
@@ -68,6 +78,7 @@ public class connect extends AppCompatActivity {
         chatBtn = findViewById(R.id.chatBTN);
         chatBtn.setEnabled(false);
         user = auth.getCurrentUser();
+        senderUID = user.getUid();
 
         chatBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,14 +111,20 @@ public class connect extends AppCompatActivity {
                                     String userUID = snapList.get(0).get("userUID").toString();
                                     String email = snapList.get(0).get("email").toString();
                                     String uiD = snapList.get(0).get("UID").toString();
-                                    Intent i = new Intent(getBaseContext(), MessageActivity.class);
-                                    Bundle b = new Bundle();
-                                    b.putString("UID", uiD);
-                                    b.putString("userUID", userUID);
-                                    b.putString("email", email);
-                                    i.putExtras(b);
-                                    startActivity(i);
-                                    progressDialog.dismiss();
+                                    String verified = snapList.get(0).get("verified").toString();
+                                    if(verified.equals("1")) {
+                                        Intent i = new Intent(getBaseContext(), MessageActivity.class);
+                                        Bundle b = new Bundle();
+                                        b.putString("UID", uiD);
+                                        b.putString("userUID", userUID);
+                                        b.putString("email", email);
+                                        i.putExtras(b);
+                                        progressDialog.dismiss();
+                                        startActivity(i);
+                                    } else {
+                                        Toast.makeText(connect.this, "USER IS NOT VERIFIED", Toast.LENGTH_SHORT).show();
+                                        progressDialog.dismiss();
+                                    }
                                 } else {
                                     Log.d(TAG, "Error ");
                                     Toast.makeText(getApplicationContext(), "No User Found", Toast.LENGTH_SHORT).show();
@@ -164,6 +181,7 @@ public class connect extends AppCompatActivity {
             chatBtn.setEnabled(true);
             verifyBtn.setVisibility(View.GONE);
             verifyText.setVisibility(View.GONE);
+            verifed(user.getUid());
         } else {
             verifyText.setVisibility(View.VISIBLE);
             verifyBtn.setVisibility(View.VISIBLE);
@@ -171,6 +189,20 @@ public class connect extends AppCompatActivity {
             Toast.makeText(this, "Please verify the email", Toast.LENGTH_SHORT).show();
             Toast.makeText(this, "if E-mail is verified \n please logout and sign-in again", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void verifed(String uid) {
+        DocumentReference docref = db.collection("users").document(uid);
+        docref.update("verified","1").addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+                    Toast.makeText(connect.this, "User is Verified", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(connect.this, "not Verified :"+task.getException(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void fetchID() {
@@ -216,11 +248,12 @@ public class connect extends AppCompatActivity {
     }
 
     private void addfriendslist() {
-
+        Dialog dialog = new Dialog();
+        dialog.show(getSupportFragmentManager(), "Add");
     }
 
     private void showFriendsList() {
-
+        Toast.makeText(this, "showFriendsList", Toast.LENGTH_SHORT).show();
     }
 
     private void connec_logout() {
