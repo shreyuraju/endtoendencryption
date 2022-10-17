@@ -50,7 +50,7 @@ public class Dialog extends AppCompatDialogFragment {
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                        dialogInterface.dismiss();
                     }
                 })
                 .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
@@ -68,7 +68,6 @@ public class Dialog extends AppCompatDialogFragment {
                                     return;
                                 } else {
                                     return;
-
                                 }
                             }
                         });
