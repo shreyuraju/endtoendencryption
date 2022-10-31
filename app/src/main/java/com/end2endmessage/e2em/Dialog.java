@@ -42,8 +42,11 @@ public class Dialog extends AppCompatDialogFragment {
         user = auth.getCurrentUser();
         adderUid = user.getUid();
 
+
         uid = view.findViewById(R.id.adduid);
         name = view.findViewById(R.id.addname);
+        String UID = uid.getText().toString().trim();
+        String fname = name.getText().toString().trim();
 
         builder.setView(view)
                 .setTitle("Add")
@@ -56,8 +59,12 @@ public class Dialog extends AppCompatDialogFragment {
                 .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String UID = uid.getText().toString().trim();
-                        String fname = name.getText().toString().trim();
+                        if(TextUtils.isEmpty(UID)) {
+                            uid.setError("Need UID");
+                        }
+                        if(TextUtils.isEmpty(fname)){
+                            name.setError("Need name");
+                        }
                         Map map = new HashMap();
                         map.put("UID", UID);
                         map.put("name", fname);
